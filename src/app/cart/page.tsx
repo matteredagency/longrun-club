@@ -1,6 +1,8 @@
 "use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
@@ -12,7 +14,14 @@ const FREE_SHIPPING_THRESHOLD = 75;
 
 export default function CartPage() {
   const { items, removeItem, updateQty, total, count } = useCart();
+  const searchParams = useSearchParams();
+  const [promoCode, setPromoCode] = useState("");
   const related = getRelatedProducts("", 4);
+
+  useEffect(() => {
+    const code = searchParams.get("discount_code");
+    if (code) setPromoCode(code);
+  }, [searchParams]);
   const tax = total * TAX_RATE;
   const shipping = total >= FREE_SHIPPING_THRESHOLD ? 0 : 9.95;
   const orderTotal = total + tax + shipping;
@@ -93,7 +102,7 @@ export default function CartPage() {
 
               {/* Promo code */}
               <form className="flex gap-2 mb-6" onSubmit={e => e.preventDefault()}>
-                <input type="text" placeholder="Promo code" className="flex-1 px-4 py-2.5 rounded-lg border border-black/15 text-sm outline-none focus:border-[#3B82F6] transition-all" />
+                <input type="text" placeholder="Promo code" value={promoCode} onChange={e => setPromoCode(e.target.value)} className="flex-1 px-4 py-2.5 rounded-lg border border-black/15 text-sm outline-none focus:border-[#3B82F6] transition-all" />
                 <button type="submit" className="px-4 py-2.5 rounded-lg bg-[#F3F4F6] text-[#111827] text-sm font-medium hover:bg-black/10 transition-colors">Apply</button>
               </form>
 
